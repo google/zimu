@@ -1,0 +1,108 @@
+/*
+Copyright 2013 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+utils.loadPlatform("ti.platforms.ezdsp28335");
+
+/* The following DSP/BIOS Features are enabled.  */
+bios.enableRealTimeAnalysis(prog);
+bios.enableRtdx(prog);
+bios.enableTskManager(prog);
+
+bios.PRD.create("LEDBlink");
+bios.PRD.instance("LEDBlink").order = 1;
+bios.PRD.instance("LEDBlink").period = 1000;
+bios.PRD.instance("LEDBlink").comment = "LED Blink Test";
+bios.PRD.instance("LEDBlink").fxn = prog.extern("LedBlink");
+bios.PIE.instance("PIE_INT1_6").fxn = prog.extern("ADC_INT_ISR");
+bios.PIE.instance("PIE_INT1_6").useDispatcher = 1;
+bios.PRD.create("UpdateSensors");
+bios.PRD.instance("UpdateSensors").order = 2;
+bios.PRD.instance("UpdateSensors").comment = "Sensor Update";
+bios.PRD.instance("UpdateSensors").period = 10;
+bios.PRD.instance("UpdateSensors").fxn = prog.extern("UpdateSensors");
+bios.PRD.instance("UpdateSensors").period = 100;
+bios.PRD.instance("UpdateSensors").period = 10000;
+bios.PRD.instance("UpdateSensors").period = 100;
+bios.PRD.instance("UpdateSensors").fxn = prog.extern("SensorUpdate");
+bios.PRD.instance("UpdateSensors").period = 10;
+bios.PRD.create("SendSerial");
+bios.PRD.instance("SendSerial").order = 3;
+bios.PRD.instance("SendSerial").comment = "Process Serial Data";
+bios.PRD.instance("SendSerial").fxn = prog.extern("ProcessSerial");
+bios.PRD.instance("SendSerial").period = 1;
+bios.PRD.instance("SendSerial").period = 1000;
+bios.PRD.instance("UpdateSensors").period = 2;
+bios.PRD.instance("SendSerial").period = 1;
+bios.SWI.instance("PRD_swi").order = 1;
+bios.SWI.instance("KNL_swi").order = 2;
+bios.MEM.instance("FLASH").len = 0x3fff8;
+bios.MEM.instance("SRAM").destroy();
+bios.MEM.create("BEGIN_FLASH");
+bios.MEM.instance("BEGIN_FLASH").comment = "Boot to Flash entry point";
+bios.MEM.instance("BEGIN_FLASH").base = 0x33fff6;
+bios.MEM.instance("BEGIN_FLASH").len = 0x0002;
+bios.MEM.instance("BEGIN_FLASH").space = "code";
+bios.MEM.instance("FLASH").len = 0x3fff6;
+bios.MEM.create("ADC_CAL");
+bios.MEM.instance("ADC_CAL").comment = "ADC Calibration";
+bios.MEM.instance("ADC_CAL").base = 0x380080;
+bios.MEM.instance("ADC_CAL").len = 0x0010;
+bios.MEM.instance("ADC_CAL").space = "code";
+bios.MEM.GBLINITSEG = prog.get("FLASH");
+bios.MEM.BIOSSEG = prog.get("FLASH");
+bios.MEM.SYSINITSEG = prog.get("FLASH");
+bios.MEM.HWISEG = prog.get("FLASH");
+bios.MEM.RTDXTEXTSEG = prog.get("FLASH");
+bios.MEM.TEXTSEG = prog.get("FLASH");
+bios.MEM.SWITCHSEG = prog.get("FLASH");
+bios.MEM.CINITSEG = prog.get("FLASH");
+bios.MEM.PINITSEG = prog.get("FLASH");
+bios.MEM.ECONSTSEG = prog.get("FLASH");
+bios.MEM.CONSTSEG = prog.get("FLASH");
+bios.MEM.DATASEG = prog.get("FLASH");
+bios.MEM.ENABLELOADADDR = 1;
+bios.MEM.LOADBIOSSEG = prog.get("FLASH");
+bios.MEM.LOADSYSINITSEG = prog.get("FLASH");
+bios.MEM.LOADGBLINITSEG = prog.get("FLASH");
+bios.MEM.LOADTRCDATASEG = prog.get("FLASH");
+bios.MEM.LOADTEXTSEG = prog.get("FLASH");
+bios.MEM.LOADSWITCHSEG = prog.get("FLASH");
+bios.MEM.LOADCINITSEG = prog.get("FLASH");
+bios.MEM.LOADPINITSEG = prog.get("FLASH");
+bios.MEM.LOADECONSTSEG = prog.get("FLASH");
+bios.MEM.LOADCONSTSEG = prog.get("FLASH");
+bios.MEM.LOADDATASEG = prog.get("FLASH");
+bios.MEM.LOADHWISEG = prog.get("FLASH");
+bios.MEM.LOADHWIVECSEG = prog.get("FLASH");
+bios.MEM.LOADRTDXTEXTSEG = prog.get("FLASH");
+bios.GBL.CALLUSERINITFXN = 1;
+bios.GBL.USERINITFXN = prog.extern("UserInit");
+bios.PIE.instance("PIE_INT6_1").fxn = prog.extern("ReadSPIResult", "asm");
+bios.PIE.instance("PIE_INT6_1").useDispatcher = 1;
+bios.PIE.instance("PIE_INT6_1").fxn = prog.extern("ReadSPIResult");
+bios.PIE.instance("PIE_INT6_1").fxn = prog.extern("ReadSPI_ISR");
+bios.PIE.instance("PIE_INT6_1").fxn = prog.extern("ReadSpi_ISR");
+bios.PRD.instance("SendSerial").destroy();
+bios.PIE.instance("PIE_INT9_3").fxn = prog.extern("ReceiveData_ISR");
+bios.PIE.instance("PIE_INT9_3").useDispatcher = 1;
+bios.PIE.instance("PIE_INT9_4").fxn = prog.extern("SendData_ISR");
+bios.PIE.instance("PIE_INT9_4").useDispatcher = 1;
+bios.PRD.instance("LEDBlink").period = 250;
+bios.PRD.instance("UpdateSensors").period = 1;
+// !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
+
+prog.gen();
+
